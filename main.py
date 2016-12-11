@@ -3,6 +3,7 @@ from flask_api import status
 from flask_restful import Resource, Api
 
 from consts import *
+from models import db
 
 app = Flask("NN")
 # Load config for app
@@ -12,6 +13,11 @@ else:
 	app.config.from_object('consts.TestingConfig')
 # Catch all unexpected 404s in json format
 api = Api(app, catch_all_404s = True)
+
+# Init DB
+db.app = app
+db.init_app(app)
+db.create_all()
 
 class UserList(Resource):
 	"""
