@@ -1,5 +1,9 @@
 # Change Log
 
+## v1.0.5
+- Add User resource with unittest
+- Fixed testInfo
+
 ## v1.0.4
 - Minor fix: uri for test sql base
 
