@@ -72,7 +72,6 @@ class TestUserList(unittest.TestCase):
 		Try to get empty UserList
 		Check return code is 400
 		"""
-		# Clean Users table firstt
 		DBUser.query.delete()
 		res = self.client.get(self.url)
 		self.assertEquals(res.status_code, status.HTTP_404_NOT_FOUND)
@@ -85,6 +84,32 @@ class TestUserList(unittest.TestCase):
 		self.client.post(self.url, data = '{"x": %s, "y": %s}' % self.getCoords())
 		res = self.client.get(self.url)
 		self.assertEquals(res.status_code, status.HTTP_200_OK)
+
+	def testUserListPages(self):
+		"""
+		Remove all data, generate 10 records.
+		Try to show data for page=1 with pagesize=9
+		Result code 200 is expected
+		Then try to move over maximum
+		with page=0, pagesize=10 and page=2, pagesize=9
+		Result code 404 is expected
+		"""
+		DBUser.query.delete()
+		for i in range(10):
+			self.client.post(self.url, data = '{"x": %s, "y": %s}' % self.getCoords())
+
+		url_params = "?page=1&pagesize=9"
+		res = self.client.get(self.url + url_params)
+		self.assertEquals(res.status_code, status.HTTP_200_OK)
+
+		url_params = "?page=2&pagesize=9"
+		res = self.client.get(self.url + url_params)
+		self.assertEquals(res.status_code, status.HTTP_404_NOT_FOUND)
+
+		url_params = "?page=1&pagesize=10"
+		res = self.client.get(self.url + url_params)
+		self.assertEquals(res.status_code, status.HTTP_404_NOT_FOUND)
+
 
 class TestInfo(unittest.TestCase):
 	"""
