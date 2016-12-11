@@ -1,5 +1,8 @@
 # Change Log
 
+## v1.0.4
+- Minor fix: uri for test sql base
+
 ## v1.0.3
 - Add pages functionality to list users
 
