@@ -1,4 +1,5 @@
 import unittest
+import random
 
 from main import app
 from flask_api import status
@@ -9,6 +10,12 @@ from models import *
 db.app = app
 db.init_app(app)
 db.create_all()
+
+# generate random data
+xs = range(1, 100)
+random.shuffle(xs)
+ys = range(1, 100)
+random.shuffle(ys)
 
 class TestDB(unittest.TestCase):
 	"""
@@ -29,39 +36,53 @@ class TestUserList(unittest.TestCase):
 	def setUp(self):
 		self.client = app.test_client()
 		self.url = "%s/users" % BASEURL
+		# lambda to generate random unique coordinates
+		self.getCoords = lambda: (xs.pop(), ys.pop())
 
 	def testAddUser(self):
 		"""
 		Try to add new user
 		Check return code is 201
 		"""
-		res = self.client.post(self.url, data = '{"x": 2, "y": 2}')
+		res = self.client.post(self.url, data = '{"x": %s, "y": %s}' % self.getCoords())
 		self.assertEquals(res.status_code, status.HTTP_201_CREATED)
 
-	def testAddUser(self):
+	def testAddInvalidUser(self):
 		"""
 		Try to add new user without x or y
 		Check return code is 400
 		"""
-		res = self.client.post(self.url, data = '{"x": 2}')
+		res = self.client.post(self.url, data = '{"x": %s}' % xs.pop())
 		self.assertEquals(res.status_code, status.HTTP_400_BAD_REQUEST)
-		res = self.client.post(self.url, data = '{"y": 2}')
+		res = self.client.post(self.url, data = '{"y": %s}' % ys.pop())
 		self.assertEquals(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+	def testAddiExistedUser(self):
+		"""
+		Try to add new existed user
+		Check return code is 409
+		"""
+		coords = self.getCoords()
+		self.client.post(self.url, data = '{"x": %s, "y": %s}' % coords)
+		res = self.client.post(self.url, data = '{"x": %s, "y": %s}' % coords)
+		self.assertEquals(res.status_code, status.HTTP_409_CONFLICT)
 
 	def testEmptyUserList(self):
 		"""
 		Try to get empty UserList
 		Check return code is 400
 		"""
-		#TODO: remove data first
-		pass
+		# Clean Users table firstt
+		DBUser.query.delete()
+		res = self.client.get(self.url)
+		self.assertEquals(res.status_code, status.HTTP_404_NOT_FOUND)
 
 	def testFullUserList(self):
 		"""
 		Try to get UserList
 		Check return code is 200
 		"""
-		self.client.post(self.url, data = '{"x": 3, "y": 3}')
+		self.client.post(self.url, data = '{"x": %s, "y": %s}' % self.getCoords())
 		res = self.client.get(self.url)
 		self.assertEquals(res.status_code, status.HTTP_200_OK)
 
