@@ -113,14 +113,62 @@ class User(Resource):
 		curl http://127.0.0.1:5000/v1/NN/users/id/delete -X DELETE
 	"""
 
+	def _not_found_error(self, user_id):
+		return {
+			"message": "User %s not found" % user_id
+		}, status.HTTP_404_NOT_FOUND
+
 	def get(self, user_id):
-		return {}, status.HTTP_200_OK
+		"""
+		Return User object
+		"""
+		user = DBUser.query.filter_by(id = user_id).first()
+		if not user:
+			return self._not_found_error(user_id)
+		return {
+			"message": "OK",
+			"x": user.x,
+			"y": user.y
+		}, status.HTTP_200_OK
 		
 	def post(self, user_id):
-		return {}, status.HTTP_200_OK
+		"""
+		Update User object
+		"""
+		user = DBUser.query.filter_by(id = user_id).first()
+		if not user:
+			return self._not_found_error(user_id)
+		json_data = request.get_json(force = True)
+		if "x" not in json_data and "y" not in json_data:
+			return {
+				"message": "Bad request. x or y keys are requied."
+			}, status.HTTP_400_BAD_REQUEST
+
+		x = json_data.get("x")
+		y = json_data.get("y")
+		if x:
+			user.x = x
+		if y:
+			user.y = y
+		db.session.flush()
+		db.session.commit()
+		return {
+			"message": "OK",
+			"user_url": "%s/%s" %(request.url, user.id)
+		}, status.HTTP_200_OK
 		
 	def delete(self, user_id):
-		return {}, status.HTTP_200_OK
+		"""
+		Delete User object
+		"""
+		user = DBUser.query.filter_by(id = user_id).first()
+		if not user:
+			return self._not_found_error(user_id)
+		user.query.delete()
+		db.session.commit()
+		return {
+			"message": "OK"
+		}, status.HTTP_200_OK
 
 api.add_resource(UserList, "%s/users" % BASEURL)
 api.add_resource(Info, "%s/users/info" % BASEURL)
