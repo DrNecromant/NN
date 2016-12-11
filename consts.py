@@ -9,5 +9,5 @@ class ProductionConfig(object):
 class TestingConfig(object):
 	TESTING = True
 	DEBUG = True
-	DATABASE_URI = 'sqlite:///:memory:'
+	SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
 	SQLALCHEMY_TRACK_MODIFICATIONS = True
