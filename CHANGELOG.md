@@ -1,5 +1,8 @@
 # Change Log
 
+## v1.0.0
+- UserList with unittests implementation
+
 ## v0.2.0
 - Skeleton for main app (CRUD)
 - Added conts module with app config
