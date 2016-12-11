@@ -3,7 +3,7 @@ from flask_api import status
 from flask_restful import Resource, Api
 
 from consts import *
-from models import db
+from models import *
 
 app = Flask("NN")
 # Load config for app
