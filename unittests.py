@@ -124,12 +124,12 @@ class TestInfo(unittest.TestCase):
 		Try to get info
 		Check return code is 200
 		"""
-		res = self.client.post(self.url)
+		res = self.client.get(self.url)
 		self.assertEquals(res.status_code, status.HTTP_200_OK)
 
 if __name__ == "__main__":
 	suites = list()
-	for test in (TestDB, TestUserList):
+	for test in (TestDB, TestUserList, TestInfo):
 		suites.append(unittest.TestLoader().loadTestsFromTestCase(test))
 	suite = unittest.TestSuite(suites)
 	results = unittest.TextTestRunner(verbosity = 2).run(suite)
