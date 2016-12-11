@@ -43,9 +43,15 @@ class UserList(Resource):
 	def get(self):
 		"""
 		Get user list
+		By default show only first 100 records
+		page and pagesize are configurable by request args
 		"""
-		#TODO: show only first 100 records, add parametr to show next records
-		users = DBUser.query.all()
+		page = int(request.args.get('page', 0))
+		pagesize = int(request.args.get('pagesize', 100))
+		query = DBUser.query
+		query = query.offset(page * pagesize)
+		query = query.limit(pagesize)
+		users = query.all()
 		if not users:
 			return {
 				"message": "Users not found"
