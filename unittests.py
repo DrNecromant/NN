@@ -31,7 +31,7 @@ class TestDB(unittest.TestCase):
 
 class TestUserList(unittest.TestCase):
 	"""
-	Unittests for endpoints
+	Unittests for UserList
 	"""
 	def setUp(self):
 		self.client = app.test_client()
@@ -84,6 +84,22 @@ class TestUserList(unittest.TestCase):
 		"""
 		self.client.post(self.url, data = '{"x": %s, "y": %s}' % self.getCoords())
 		res = self.client.get(self.url)
+		self.assertEquals(res.status_code, status.HTTP_200_OK)
+
+class TestInfo(unittest.TestCase):
+	"""
+	Unittests for Info
+	"""
+	def setUp(self):
+		self.client = app.test_client()
+		self.url = "%s/users/info" % BASEURL
+
+	def testGetInfo(self):
+		"""
+		Try to get info
+		Check return code is 200
+		"""
+		res = self.client.post(self.url)
 		self.assertEquals(res.status_code, status.HTTP_200_OK)
 
 if __name__ == "__main__":

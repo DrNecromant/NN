@@ -19,6 +19,18 @@ db.app = app
 db.init_app(app)
 db.create_all()
 
+class Info(Resource):
+	"""
+	Provide information about Users
+	"""
+
+	def get(self):
+		user_count = DBUser.query.count()
+		return {
+			"message": "OK",
+			"user_count": user_count
+		}, status.HTTP_200_OK
+
 class UserList(Resource):
 	"""
 	Controller to show and modify userlist
@@ -105,6 +117,7 @@ class User(Resource):
 		return {}, status.HTTP_200_OK
 
 api.add_resource(UserList, "%s/users" % BASEURL)
+api.add_resource(Info, "%s/users/info" % BASEURL)
 api.add_resource(User, "%s/users/<int:user_id>" % BASEURL)
 
 if __name__ == '__main__':
