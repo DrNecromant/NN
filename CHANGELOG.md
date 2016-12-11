@@ -1,5 +1,8 @@
 # Change Log
 
+## v1.0.3
+- Add pages functionality to list users
+
 ## v1.0.2
 - Add resource info that returns users count
 
