@@ -12,9 +12,9 @@ db.init_app(app)
 db.create_all()
 
 # generate random data
-xs = range(1, 100)
+xs = range(1, 1000)
 random.shuffle(xs)
-ys = range(1, 100)
+ys = range(1, 1000)
 random.shuffle(ys)
 
 class TestDB(unittest.TestCase):
@@ -110,6 +110,76 @@ class TestUserList(unittest.TestCase):
 		res = self.client.get(self.url + url_params)
 		self.assertEquals(res.status_code, status.HTTP_404_NOT_FOUND)
 
+class TestUser(unittest.TestCase):
+	"""
+	Unittests for User: get, update, delete
+	"""
+
+	def setUp(self):
+		self.client = app.test_client()
+		self.url = "%s/users" % BASEURL
+		self.getCoords = lambda: (xs.pop(), ys.pop())
+
+	def _get_user_url(self, user_id):
+		return "%s/%s" % (self.url, user_id)
+
+	def _create_db_user(self):
+		"""
+		Create DB user and return user object
+		"""
+		x, y = self.getCoords()
+		user = DBUser(x = x, y = y)
+		db.session.add(user)
+		db.session.flush()
+		db.session.commit()
+		return user
+
+	def testGetUser(self):
+		"""
+		Add user into DB, try to get it by id: 200 is expected
+		After that try to get user by id + 100: 404 is expected
+		"""
+		user = self._create_db_user()
+		res = self.client.get(self._get_user_url(user.id))
+		self.assertEquals(res.status_code, status.HTTP_200_OK)
+		res = self.client.get(self._get_user_url(user.id + 100))
+		self.assertEquals(res.status_code, status.HTTP_404_NOT_FOUND)
+
+	def testUpdateUser(self):
+		"""
+		Check parameters might be updated one by one
+		Compare updated parameters with old ones
+		Validate that request without parameters is invalid
+		"""
+		user = self._create_db_user()
+		user_id = user.id
+		url = self._get_user_url(user_id)
+		old_x, old_y = user.x, user.y
+
+		res = self.client.post(url, data = '{"x": %s}' % xs.pop())
+		self.assertEquals(res.status_code, status.HTTP_200_OK)
+		res = self.client.post(url, data = '{"y": %s}' % ys.pop())
+		self.assertEquals(res.status_code, status.HTTP_200_OK)
+		res = self.client.post(url, data = '{}')
+		self.assertEquals(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+		user = DBUser.query.filter_by(id = user_id).one()
+		self.assertNotEqual(old_x, user.x)
+		self.assertNotEqual(old_y, user.y)
+
+	def testDeleteUser(self):
+		"""
+		Add new user in DB and delete it with API
+		Check there is no such user in DB anymore
+		"""
+		user = self._create_db_user()
+		user_id = user.id
+		url = self._get_user_url(user_id)
+		res = self.client.delete(url)
+		self.assertEquals(res.status_code, status.HTTP_200_OK)
+
+		user = DBUser.query.filter_by(id = user_id).first()
+		self.assertIsNone(user)
 
 class TestInfo(unittest.TestCase):
 	"""
@@ -129,7 +199,7 @@ class TestInfo(unittest.TestCase):
 
 if __name__ == "__main__":
 	suites = list()
-	for test in (TestDB, TestUserList, TestInfo):
+	for test in (TestDB, TestUserList, TestUser, TestInfo):
 		suites.append(unittest.TestLoader().loadTestsFromTestCase(test))
 	suite = unittest.TestSuite(suites)
 	results = unittest.TextTestRunner(verbosity = 2).run(suite)
