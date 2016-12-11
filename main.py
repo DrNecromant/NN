@@ -2,11 +2,16 @@ from flask import Flask, request
 from flask_api import status
 from flask_restful import Resource, Api
 
+from consts import *
+
 app = Flask("NN")
+# Load config for app
+if __name__ == '__main__':
+	app.config.from_object('consts.ProductionConfig')
+else:
+	app.config.from_object('consts.TestingConfig')
 # Catch all unexpected 404s in json format
 api = Api(app, catch_all_404s = True)
-
-BASEURL = "/v1/NN"
 
 class UserList(Resource):
 	"""
