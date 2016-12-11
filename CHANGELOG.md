@@ -1,5 +1,8 @@
 # Change Log
 
+## v1.0.1
+- UserList unitets improvement
+
 ## v1.0.0
 - UserList with unittests implementation
 
