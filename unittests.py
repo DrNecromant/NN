@@ -32,8 +32,6 @@ class TestDB(unittest.TestCase):
 		self.assertEquals(stats.minY, min(ylist))
 		self.assertEquals(stats.maxX, max(xlist))
 		self.assertEquals(stats.maxY, max(ylist))
-		self.assertEquals(stats.sumX, sum(xlist))
-		self.assertEquals(stats.sumY, sum(ylist))
 		self.assertEquals(stats.count, len(testdata))
 
 	def testDBUser(self):

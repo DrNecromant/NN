@@ -29,8 +29,6 @@ class DBUserStats(object):
 			db.func.max(DBUser.y).label("maxY"), \
 			db.func.avg(DBUser.x).label("avgX"), \
 			db.func.avg(DBUser.y).label("avgY"), \
-			db.func.sum(DBUser.x).label("sumX"), \
-			db.func.sum(DBUser.y).label("sumY"), \
 			db.func.count(DBUser.id).label("count"), \
 		)
 
@@ -44,6 +42,15 @@ class DBUserStats(object):
 			query = query.filter(DBUser.y <= limitY)
 
 		self.result = query.one()
+
+	@property
+	def rect(self):
+		return (
+			self.result.minX, \
+			self.result.minY, \
+			self.result.maxX, \
+			self.result.maxY, \
+		)
 
 	@property
 	def minX(self):
@@ -68,14 +75,6 @@ class DBUserStats(object):
 	@property
 	def avgY(self):
 		return int(self.result.avgY)
-
-	@property
-	def sumX(self):
-		return self.result.sumX
-
-	@property
-	def sumY(self):
-		return self.result.sumY
 
 	@property
 	def count(self):
