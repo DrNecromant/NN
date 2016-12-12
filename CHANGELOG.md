@@ -1,5 +1,8 @@
 # Change Log
 
+## v1.2.3
+- Added integration test
+
 ## v1.2.2
 - Re-create DB on service start
 - Add comments to Info controller
