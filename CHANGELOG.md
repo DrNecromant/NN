@@ -1,5 +1,9 @@
 # Change Log
 
+## v1.2.1
+- Minor fixes and improvements
+- Cleanup
+
 ## v1.2.0
 - Main algorythm implementation
 - Minor fixes
