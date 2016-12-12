@@ -246,8 +246,8 @@ class TestKnn(unittest.TestCase):
 	Unittests for Knn
 	"""
 	def setUp(self):
-		self.radius = 100
-		self.user_id = 10
+		self.radius = SQL_TESTDATA_COUNT / 3
+		self.user_id = 1
 		self.client = app.test_client()
 		self.url = "%s/users/knn" % BASEURL
 
@@ -263,11 +263,10 @@ class TestKnn(unittest.TestCase):
 			self.assertEquals(res.status_code, status.HTTP_400_BAD_REQUEST)
 
 		DBUser.query.delete()
-		for i in range(800):
+		for i in range(SQL_TESTDATA_COUNT):
 			db.session.add(DBUser(*coord.pop()))
 		db.session.commit()
 		res = self.client.get("%s?%s&%s" % (self.url, Rarg, Uarg))
-		#print "\nRESULT\n", res.get_data()
 		self.assertEquals(res.status_code, status.HTTP_200_OK)
 
 if __name__ == "__main__":
