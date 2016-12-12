@@ -1,5 +1,8 @@
 # Change Log
 
+## v1.1.4
+- Exclude sum from DBUserStats
+
 ## v1.1.3
 - Fix unittest for DBUserStats
 
