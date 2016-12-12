@@ -1,5 +1,6 @@
 import unittest
 import random
+from math import sqrt
 
 from main import app
 from flask_api import status
@@ -64,7 +65,7 @@ class TestDB(unittest.TestCase):
 		# Test stats with limits
 		# Cut testdata for that
 		sorted_x, sorted_y = map(sorted, zip(*testdata))
-		cut_index = SQL_TESTDATA_COUNT / 5
+		cut_index = int(sqrt(SQL_TESTDATA_COUNT) / 5)
 		offsetX = sorted_x[cut_index]
 		offsetY = sorted_y[cut_index]
 		limitX = sorted_x[-cut_index]
