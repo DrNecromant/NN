@@ -1,5 +1,8 @@
 # Change Log
 
+## v1.1.3
+- Fix unittest for DBUserStats
+
 ## v1.1.2
 - Extend unittests for DBUserStats
 - Fix DBUserStats with limit and offsets
