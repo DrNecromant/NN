@@ -1,4 +1,5 @@
 from math import sqrt
+import os
 
 from flask import Flask, request
 from flask_api import status
@@ -11,6 +12,9 @@ app = Flask("NN")
 # Load config for app
 if __name__ == '__main__':
 	app.config.from_object('consts.ProductionConfig')
+	# re-create DB to not conflict with old data
+	if os.path.exists(DBFile):
+		os.unlink(DBFile)
 else:
 	app.config.from_object('consts.TestingConfig')
 # Catch all unexpected 404s in json format
@@ -24,6 +28,8 @@ db.create_all()
 class Info(Resource):
 	"""
 	Provide information about Users
+	Example:
+		http://127.0.0.1:5000/v1/NN/users/info -X GET
 	"""
 
 	def get(self):
