@@ -245,11 +245,11 @@ class Knn(Resource):
 		# Intersection between rectangle and search area
 		if stats.count <= MIN_USERS:
 			# In case of small amount of users, calculate distances manually
-			users = DBUser.query.filter_by(\
-				x >= stats.minX, \
-				x <= stats.maxX, \
-				y >= stats.minY, \
-				y <= stats.maxY).all()
+			users = DBUser.query.filter(\
+				DBUser.x >= stats.minX, \
+				DBUser.x <= stats.maxX, \
+				DBUser.y >= stats.minY, \
+				DBUser.y <= stats.maxY).all()
 			for user in users:
 				dist = sqrt((self.x0 - user.x) ** 2 + (self.y0 - user.y) ** 2)
 				if dist <= self.r:
@@ -258,14 +258,14 @@ class Knn(Resource):
 			# Split rect into two in longer side
 			if abs(stats.maxX - stats.minX) >= abs(stats.maxY - stats.minY):
 				# find nearest left and right of avgX
-				leftX = DBUser.query.filter_by(x <= stats.avgX).order_by(x.desc).first().x
-				rightX = DBUser.query.filter_by(x > stats.avgX).order_by(x).first().x
+				leftX = DBUser.query.filter(DBUser.x <= stats.avgX).order_by(db.desc(DBUser.x)).first().x
+				rightX = DBUser.query.filter(DBUser.x > stats.avgX).order_by(DBUser.x).first().x
 				stats1 = DBUserStats(stats.minX, stats.minY, leftX, stats.maxY)
 				stats2 = DBUserStats(rightX, stats.minY, stats.maxX, stats.maxY)
 			else:
 				# find nearest left and right of avgY
-				downY = DBUser.query.filter_by(y <= stats.avgY).order_by(y.desc).first().y
-				upY = DBUser.query.filter_by(y > stats.avgY).order_by(y).first().y
+				downY = DBUser.query.filter(DBUser.y <= stats.avgY).order_by(db.desc(DBUser.y)).first().y
+				upY = DBUser.query.filter(DBUser.y > stats.avgY).order_by(DBUser.y).first().y
 				stats1 = DBUserStats(stats.minX, stats.minY, stats.maxX, downY)
 				stats2 = DBUserStats(stats.minX, upY, stats.maxX, stats.maxY)
 			result += self.getkNN(stats1)
