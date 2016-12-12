@@ -1,5 +1,9 @@
 # Change Log
 
+## v1.2.0
+- Main algorythm implementation
+- Minor fixes
+
 ## v1.1.5
 - Initial steps in main algorythm, preparations
 
