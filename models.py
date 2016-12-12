@@ -45,11 +45,14 @@ class DBUserStats(object):
 
 	@property
 	def rect(self):
+		"""
+		return rect corner coordinates
+		"""
 		return (
-			self.result.minX, \
-			self.result.minY, \
-			self.result.maxX, \
-			self.result.maxY, \
+			(self.result.minX, self.result.minY), \
+			(self.result.minX, self.result.maxY), \
+			(self.result.maxX, self.result.minY), \
+			(self.result.maxX, self.result.maxY), \
 		)
 
 	@property
