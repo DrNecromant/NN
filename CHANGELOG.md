@@ -1,5 +1,10 @@
 # Change Log
 
+## v1.2.2
+- Re-create DB on service start
+- Add comments to Info controller
+- Add requests module to requirements
+
 ## v1.2.1
 - Minor fixes and improvements
 - Cleanup
