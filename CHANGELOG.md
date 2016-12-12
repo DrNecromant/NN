@@ -1,5 +1,8 @@
 # Change Log
 
+## v1.1.5
+- Initial steps in main algorythm, preparations
+
 ## v1.1.4
 - Exclude sum from DBUserStats
 
