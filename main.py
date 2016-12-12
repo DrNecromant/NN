@@ -178,14 +178,33 @@ class Knn(Resource):
 		curl http://127.0.0.1:5000/v1/NN/users/knn?U=10&R=10 -X GET
 	"""
 
+	def getkNN(self, minX, minY, maxX, maxY):
+		"""
+		=== Main algorythm ===
+		If rect has small user count, check all distances
+		and return users count inside the search zone
+		Check rect and the search zone
+			- If inside retrun 0
+			- If outside return rect user count
+			- If has intersections:
+			split into two rect and apply the same algorythm
+		Intersections logic:
+			- Find min and max distance from initial user to rect
+			- Compare distance with R
+		Split logic:
+			- Split longer rect side.
+			- Split by neighbors of avarage value
+		"""
+		return 0
+
 	def get(self):
 		"""
 		Return result of kNN algorythm
 		R and U arguments are mandatory
 		"""
-		radius = int(request.args.get('R', 0))
+		r = int(request.args.get('R', 0))
 		user_id = int(request.args.get('U', 0))
-		if not radius:
+		if not r:
 			return {
 				"message": "Bad request. R argument is required."
 			}, status.HTTP_400_BAD_REQUEST
@@ -194,11 +213,28 @@ class Knn(Resource):
 				"message": "Bad request. U argument is required."
 			}, status.HTTP_400_BAD_REQUEST
 
-		#TODO: main algorithm
+		#TODO: Check min users
+
+		u = DBUser.query.filter_by(id = user_id).first()
+		if not u:
+			return {
+				"message": "User %s not found" % user_id
+			}, status.HTTP_404_NOT_FOUND
+
+		dstats = DBUserStats()
+		nnstats = DBUserStats(u.x - r, u.y - r, u.x + r, u.y + r)
+		init_rect = (
+			max(dstats.minX, nnstats.minX),
+			max(dstats.minY, nnstats.minY),
+			min(dstats.maxX, nnstats.maxX),
+			min(dstats.maxY, nnstats.maxY),
+		)
+
+		result = self.getkNN(*init_rect)
 
 		return {
 			"message": "OK",
-			"result": 0,
+			"result": result,
 		}, status.HTTP_200_OK
 
 api.add_resource(UserList, "%s/users" % BASEURL)
