@@ -33,11 +33,11 @@ class Info(Resource):
 
 class UserList(Resource):
 	"""
-	Controller to show and modify userlist
+	Controller to show and extend userlist
 	If user exists return 409 Conflict 
 	Example:
 		curl http://127.0.0.1:5000/v1/NN/users -X POST -d '{"x": 1, "y": 2}'
-		curl http://127.0.0.1:5000/v1/NN/users -X GET
+		curl http://127.0.0.1:5000/v1/NN/users?page=2&pagesize=5 -X GET
 	"""
 
 	def get(self):
@@ -170,9 +170,37 @@ class User(Resource):
 			"message": "OK"
 		}, status.HTTP_200_OK
 
+class Knn(Resource):
+	"""
+	Controller to find K nearest neighbors
+	R (raduis) and U (user_id) arguments are mandatory
+	Example:
+		curl http://127.0.0.1:5000/v1/NN/users/knn?U=10&R=10 -X GET
+	"""
+
+	def get(self):
+		radius = int(request.args.get('R', 0))
+		user_id = int(request.args.get('U', 0))
+		if not radius:
+			return {
+				"message": "Bad request. R argument is required."
+			}, status.HTTP_400_BAD_REQUEST
+		if not user_id:
+			return {
+				"message": "Bad request. U argument is required."
+			}, status.HTTP_400_BAD_REQUEST
+
+		#TODO: main algorithm
+
+		return {
+			"message": "OK",
+			"result": 0,
+		}, status.HTTP_200_OK
+
 api.add_resource(UserList, "%s/users" % BASEURL)
 api.add_resource(Info, "%s/users/info" % BASEURL)
 api.add_resource(User, "%s/users/<int:user_id>" % BASEURL)
+api.add_resource(Knn, "%s/users/knn" % BASEURL)
 
 if __name__ == '__main__':
 	app.run(debug = True)
