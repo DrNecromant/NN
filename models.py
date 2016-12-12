@@ -32,13 +32,13 @@ class DBUserStats(object):
 			db.func.count(DBUser.id).label("count"), \
 		)
 
-		if offsetX:
+		if offsetX is not None:
 			query = query.filter(DBUser.x >= offsetX)
-		if offsetY:
+		if offsetY is not None:
 			query = query.filter(DBUser.y >= offsetY)
-		if limitX:
+		if limitX is not None:
 			query = query.filter(DBUser.x <= limitX)
-		if limitY:
+		if limitY is not None:
 			query = query.filter(DBUser.y <= limitY)
 
 		self.result = query.one()
