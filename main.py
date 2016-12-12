@@ -179,6 +179,10 @@ class Knn(Resource):
 	"""
 
 	def get(self):
+		"""
+		Return result of kNN algorythm
+		R and U arguments are mandatory
+		"""
 		radius = int(request.args.get('R', 0))
 		user_id = int(request.args.get('U', 0))
 		if not radius:
