@@ -1,5 +1,9 @@
 # Change Log
 
+## v1.1.2
+- Extend unittests for DBUserStats
+- Fix DBUserStats with limit and offsets
+
 ## v1.1.1
 - Add user stats model
 - Unitests for userstats
