@@ -21,6 +21,20 @@ class TestDB(unittest.TestCase):
 	"""
 	Unittests for DB
 	"""
+
+	def _assertValidStats(self, stats, testdata):
+		"""
+		Compare DB stats and list stats
+		"""
+		xlist, ylist = zip(*testdata)
+		self.assertEquals(stats.minX, min(xlist))
+		self.assertEquals(stats.minY, min(ylist))
+		self.assertEquals(stats.maxX, max(xlist))
+		self.assertEquals(stats.maxY, max(ylist))
+		self.assertEquals(stats.sumX, sum(xlist))
+		self.assertEquals(stats.sumY, sum(ylist))
+		self.assertEquals(stats.count, len(testdata))
+
 	def testDBUser(self):
 		"""
 		Try to create record in a table DBUser
@@ -45,14 +59,25 @@ class TestDB(unittest.TestCase):
 
 		# Get stats from DB and validate them
 		stats = DBUserStats()
-		xlist, ylist = zip(*testdata)
-		self.assertEquals(stats.minX, min(xlist))
-		self.assertEquals(stats.minY, min(ylist))
-		self.assertEquals(stats.maxX, max(xlist))
-		self.assertEquals(stats.maxY, max(ylist))
-		self.assertEquals(stats.sumX, sum(xlist))
-		self.assertEquals(stats.sumY, sum(ylist))
-		self.assertEquals(stats.count, len(testdata))
+		self._assertValidStats(stats, testdata)
+
+		# Test stats with limits
+		# Cut testdata for that
+		sorted_x, sorted_y = map(sorted, zip(*testdata))
+		cut_index = SQL_TESTDATA_COUNT / 5
+		offsetX = sorted_x[cut_index]
+		offsetY = sorted_y[cut_index]
+		limitX = sorted_x[-cut_index]
+		limitY = sorted_y[-cut_index]
+		testdata = [
+			(x, y) for x, y in testdata \
+			if y <= limitY and y >= offsetY and \
+			x <= limitX and x >= offsetX
+		]
+
+		# Get stats from DB and validate them
+		stats = DBUserStats(offsetX, offsetY, limitX, limitY)
+		self._assertValidStats(stats, testdata)
 
 class TestUserList(unittest.TestCase):
 	"""
