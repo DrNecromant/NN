@@ -1,3 +1,5 @@
+from math import sqrt
+
 from flask import Flask, request
 from flask_api import status
 from flask_restful import Resource, Api
@@ -177,6 +179,38 @@ class Knn(Resource):
 	Example:
 		curl http://127.0.0.1:5000/v1/NN/users/knn?U=10&R=10 -X GET
 	"""
+	def __init__(self):
+		"""
+		Initial conditions:
+		- user coord
+		- radius
+		"""
+		self.x0 = None
+		self.y0 = None
+		self.r = None
+
+	def getMinMaxRectDist(self, stats):
+		"""
+		Returns min and max distances from point to rectangle
+		"""
+		dists = list()
+
+		# Add rect coner distances
+		for x, y in stats.rect:
+			dist = sqrt((self.x0 - x) ** 2 + (self.y0 - y) ** 2)
+			dists.append(dist)
+
+		# Add rect side distances
+		if (stats.minX <= self.x0 <= stats.maxX):
+			for y in (stats.minY, stats.maxY):
+				dist = abs(y - self.y0)
+				dists.append(dist)
+		if (stats.minY <= self.y0 <= stats.maxY):
+			for x in (stats.minX, stats.maxX):
+				dist = abs(x - self.x0)
+				dists.append(dist)
+
+		return min(dists), max(dists)
 
 	def getkNN(self, stats):
 		"""
@@ -184,8 +218,8 @@ class Knn(Resource):
 		If rect has small user count, check all distances
 		and return users count inside the search zone
 		Check rect and the search zone
-			- If inside retrun 0
-			- If outside return rect user count
+			- If outside return 0
+			- If inside return rect user count
 			- If has intersections:
 			split into two rect and apply the same algorythm
 		Intersections logic:
@@ -195,7 +229,49 @@ class Knn(Resource):
 			- Split longer rect side.
 			- Split by neighbors of avarage value
 		"""
-		return 0
+		result = 0
+		if stats.count == 0:
+			return 0
+
+		# Check rectangle is outside, inside or has intersections
+		min_dist, max_dist = self.getMinMaxRectDist(stats)
+		if (min_dist > self.r) and (max_dist > self.r):
+			# Rect outside
+			return 0
+		elif (min_dist <= self.r) and (max_dist <= self.r):
+			# Rect inside
+			return stats.count
+
+		# Intersection between rectangle and search area
+		if stats.count <= MIN_USERS:
+			# In case of small amount of users, calculate distances manually
+			users = DBUser.query.filter_by(\
+				x >= stats.minX, \
+				x <= stats.maxX, \
+				y >= stats.minY, \
+				y <= stats.maxY).all()
+			for user in users:
+				dist = sqrt((self.x0 - user.x) ** 2 + (self.y0 - user.y) ** 2)
+				if dist <= self.r:
+					result += 1
+		else:
+			# Split rect into two in longer side
+			if abs(stats.maxX - stats.minX) >= abs(stats.maxY - stats.minY):
+				# find nearest left and right of avgX
+				leftX = DBUser.query.filter_by(x <= stats.avgX).order_by(x.desc).first().x
+				rightX = DBUser.query.filter_by(x > stats.avgX).order_by(x).first().x
+				stats1 = DBUserStats(stats.minX, stats.minY, leftX, stats.maxY)
+				stats2 = DBUserStats(rightX, stats.minY, stats.maxX, stats.maxY)
+			else:
+				# find nearest left and right of avgY
+				downY = DBUser.query.filter_by(y <= stats.avgY).order_by(y.desc).first().y
+				upY = DBUser.query.filter_by(y > stats.avgY).order_by(y).first().y
+				stats1 = DBUserStats(stats.minX, stats.minY, stats.maxX, downY)
+				stats2 = DBUserStats(stats.minX, upY, stats.maxX, stats.maxY)
+			result += self.getkNN(stats1)
+			result += self.getkNN(stats2)
+
+		return result
 
 	def get(self):
 		"""
@@ -231,6 +307,8 @@ class Knn(Resource):
 		)
 		init_stats = DBUserStats(*init_rect)
 
+		self.x0, self.y0 = (u.x, u.y)
+		self.r = r
 		result = self.getkNN(init_stats)
 
 		return {
