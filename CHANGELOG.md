@@ -1,5 +1,9 @@
 # Change Log
 
+## v1.1.0
+- kNN controller skeleton
+- unittests for kNN controller
+
 ## v1.0.5
 - Add User resource with unittest
 - Fixed testInfo
