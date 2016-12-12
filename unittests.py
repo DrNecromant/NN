@@ -13,10 +13,8 @@ db.init_app(app)
 db.create_all()
 
 # generate random data
-xs = range(1, 1000)
-random.shuffle(xs)
-ys = range(1, 1000)
-random.shuffle(ys)
+coord = [(x, y) for x in xrange(1, 1000) for y in xrange(1, 1000)]
+random.shuffle(coord)
 
 class TestDB(unittest.TestCase):
 	"""
@@ -38,7 +36,7 @@ class TestDB(unittest.TestCase):
 		"""
 		Try to create record in a table DBUser
 		"""
-		user = DBUser(x = xs.pop(), y = ys.pop())
+		user = DBUser(*coord.pop())
 		db.session.add(user)
 		db.session.commit()
 
@@ -47,7 +45,7 @@ class TestDB(unittest.TestCase):
 		Generate test data and validate DBUserStats
 		"""
 		# Generate testdata from random sequences
-		testdata = [(xs.pop(), ys.pop()) for i in range(SQL_TESTDATA_COUNT)]
+		testdata = [coord.pop() for i in range(SQL_TESTDATA_COUNT)]
 
 		# Fill table User with testdata
 		DBUser.query.delete()
@@ -85,15 +83,13 @@ class TestUserList(unittest.TestCase):
 	def setUp(self):
 		self.client = app.test_client()
 		self.url = "%s/users" % BASEURL
-		# lambda to generate random unique coordinates
-		self.getCoords = lambda: (xs.pop(), ys.pop())
 
 	def testAddUser(self):
 		"""
 		Try to add new user
 		Check return code is 201
 		"""
-		res = self.client.post(self.url, data = '{"x": %s, "y": %s}' % self.getCoords())
+		res = self.client.post(self.url, data = '{"x": %s, "y": %s}' % coord.pop())
 		self.assertEquals(res.status_code, status.HTTP_201_CREATED)
 
 	def testAddInvalidUser(self):
@@ -101,9 +97,10 @@ class TestUserList(unittest.TestCase):
 		Try to add new user without x or y
 		Check return code is 400
 		"""
-		res = self.client.post(self.url, data = '{"x": %s}' % xs.pop())
+		c = coord.pop()
+		res = self.client.post(self.url, data = '{"x": %s}' % c[0])
 		self.assertEquals(res.status_code, status.HTTP_400_BAD_REQUEST)
-		res = self.client.post(self.url, data = '{"y": %s}' % ys.pop())
+		res = self.client.post(self.url, data = '{"y": %s}' % c[1])
 		self.assertEquals(res.status_code, status.HTTP_400_BAD_REQUEST)
 
 	def testAddiExistedUser(self):
@@ -111,9 +108,9 @@ class TestUserList(unittest.TestCase):
 		Try to add new existed user
 		Check return code is 409
 		"""
-		coords = self.getCoords()
-		self.client.post(self.url, data = '{"x": %s, "y": %s}' % coords)
-		res = self.client.post(self.url, data = '{"x": %s, "y": %s}' % coords)
+		c = coord.pop()
+		self.client.post(self.url, data = '{"x": %s, "y": %s}' % c)
+		res = self.client.post(self.url, data = '{"x": %s, "y": %s}' % c)
 		self.assertEquals(res.status_code, status.HTTP_409_CONFLICT)
 
 	def testEmptyUserList(self):
@@ -130,7 +127,7 @@ class TestUserList(unittest.TestCase):
 		Try to get UserList
 		Check return code is 200
 		"""
-		self.client.post(self.url, data = '{"x": %s, "y": %s}' % self.getCoords())
+		self.client.post(self.url, data = '{"x": %s, "y": %s}' % coord.pop())
 		res = self.client.get(self.url)
 		self.assertEquals(res.status_code, status.HTTP_200_OK)
 
@@ -145,7 +142,7 @@ class TestUserList(unittest.TestCase):
 		"""
 		DBUser.query.delete()
 		for i in range(10):
-			self.client.post(self.url, data = '{"x": %s, "y": %s}' % self.getCoords())
+			self.client.post(self.url, data = '{"x": %s, "y": %s}' % coord.pop())
 
 		url_params = "?page=1&pagesize=9"
 		res = self.client.get(self.url + url_params)
@@ -167,7 +164,6 @@ class TestUser(unittest.TestCase):
 	def setUp(self):
 		self.client = app.test_client()
 		self.url = "%s/users" % BASEURL
-		self.getCoords = lambda: (xs.pop(), ys.pop())
 
 	def _get_user_url(self, user_id):
 		return "%s/%s" % (self.url, user_id)
@@ -176,8 +172,7 @@ class TestUser(unittest.TestCase):
 		"""
 		Create DB user and return user object
 		"""
-		x, y = self.getCoords()
-		user = DBUser(x = x, y = y)
+		user = DBUser(*coord.pop())
 		db.session.add(user)
 		db.session.flush()
 		db.session.commit()
@@ -205,16 +200,16 @@ class TestUser(unittest.TestCase):
 		url = self._get_user_url(user_id)
 		old_x, old_y = user.x, user.y
 
-		res = self.client.post(url, data = '{"x": %s}' % xs.pop())
+		c = coord.pop()
+		res = self.client.post(url, data = '{"x": %s}' % c[0])
 		self.assertEquals(res.status_code, status.HTTP_200_OK)
-		res = self.client.post(url, data = '{"y": %s}' % ys.pop())
+		res = self.client.post(url, data = '{"y": %s}' % c[1])
 		self.assertEquals(res.status_code, status.HTTP_200_OK)
 		res = self.client.post(url, data = '{}')
 		self.assertEquals(res.status_code, status.HTTP_400_BAD_REQUEST)
 
 		user = DBUser.query.filter_by(id = user_id).one()
-		self.assertNotEqual(old_x, user.x)
-		self.assertNotEqual(old_y, user.y)
+		self.assertNotEqual((old_x, old_y), (user.x, user.y))
 
 	def testDeleteUser(self):
 		"""
@@ -268,8 +263,8 @@ class TestKnn(unittest.TestCase):
 			self.assertEquals(res.status_code, status.HTTP_400_BAD_REQUEST)
 
 		DBUser.query.delete()
-		for i in range(SQL_TESTDATA_COUNT):
-			db.session.add(DBUser(xs.pop(), ys.pop()))
+		for i in range(800):
+			db.session.add(DBUser(*coord.pop()))
 		db.session.commit()
 		res = self.client.get("%s?%s&%s" % (self.url, Rarg, Uarg))
 		#print "\nRESULT\n", res.get_data()
