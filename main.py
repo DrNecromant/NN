@@ -178,7 +178,7 @@ class Knn(Resource):
 		curl http://127.0.0.1:5000/v1/NN/users/knn?U=10&R=10 -X GET
 	"""
 
-	def getkNN(self, minX, minY, maxX, maxY):
+	def getkNN(self, stats):
 		"""
 		=== Main algorythm ===
 		If rect has small user count, check all distances
@@ -229,8 +229,9 @@ class Knn(Resource):
 			min(dstats.maxX, nnstats.maxX),
 			min(dstats.maxY, nnstats.maxY),
 		)
+		init_stats = DBUserStats(*init_rect)
 
-		result = self.getkNN(*init_rect)
+		result = self.getkNN(init_stats)
 
 		return {
 			"message": "OK",
