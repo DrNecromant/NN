@@ -1,5 +1,10 @@
 # Change Log
 
+## v1.1.1
+- Add user stats model
+- Unitests for userstats
+- Minor fixes and comments
+
 ## v1.1.0
 - kNN controller skeleton
 - unittests for kNN controller
