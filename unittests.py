@@ -267,6 +267,9 @@ class TestKnn(unittest.TestCase):
 			res = self.client.get("%s?%s" % (self.url, arg))
 			self.assertEquals(res.status_code, status.HTTP_400_BAD_REQUEST)
 
+		for i in range(self.user_id):
+			db.session.add(DBUser(xs.pop(), ys.pop()))
+		db.session.commit()
 		res = self.client.get("%s?%s&%s" % (self.url, Rarg, Uarg))
 		self.assertEquals(res.status_code, status.HTTP_200_OK)
 
