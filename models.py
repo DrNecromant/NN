@@ -35,13 +35,13 @@ class DBUserStats(object):
 		)
 
 		if offsetX:
-			query.filter_by(x >= offsetX)
+			query = query.filter(DBUser.x >= offsetX)
 		if offsetY:
-			query.filter_by(y >= offsetY)
+			query = query.filter(DBUser.y >= offsetY)
 		if limitX:
-			query.filter_by(x <= limitX)
+			query = query.filter(DBUser.x <= limitX)
 		if limitY:
-			query.filter_by(y <= limitY)
+			query = query.filter(DBUser.y <= limitY)
 
 		self.result = query.one()
 
