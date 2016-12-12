@@ -25,9 +25,34 @@ class TestDB(unittest.TestCase):
 		"""
 		Try to create record in a table DBUser
 		"""
-		user = DBUser(x = 1, y = 1)
+		user = DBUser(x = xs.pop(), y = ys.pop())
 		db.session.add(user)
 		db.session.commit()
+
+	def testDBUserStats(self):
+		"""
+		Generate test data and validate DBUserStats
+		"""
+		# Generate testdata from random sequences
+		testdata = [(xs.pop(), ys.pop()) for i in range(SQL_TESTDATA_COUNT)]
+
+		# Fill table User with testdata
+		DBUser.query.delete()
+		for x, y in testdata:
+			user = DBUser(x, y)
+			db.session.add(user)
+		db.session.commit()
+
+		# Get stats from DB and validate them
+		stats = DBUserStats()
+		xlist, ylist = zip(*testdata)
+		self.assertEquals(stats.minX, min(xlist))
+		self.assertEquals(stats.minY, min(ylist))
+		self.assertEquals(stats.maxX, max(xlist))
+		self.assertEquals(stats.maxY, max(ylist))
+		self.assertEquals(stats.sumX, sum(xlist))
+		self.assertEquals(stats.sumY, sum(ylist))
+		self.assertEquals(stats.count, len(testdata))
 
 class TestUserList(unittest.TestCase):
 	"""
