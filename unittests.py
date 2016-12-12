@@ -197,9 +197,33 @@ class TestInfo(unittest.TestCase):
 		res = self.client.get(self.url)
 		self.assertEquals(res.status_code, status.HTTP_200_OK)
 
+class TestKnn(unittest.TestCase):
+	"""
+	Unittests for Knn
+	"""
+	def setUp(self):
+		self.radius = 10
+		self.user_id = 10
+		self.client = app.test_client()
+		self.url = "%s/users/knn" % BASEURL
+
+	def testGetKnn(self):
+		"""
+		Check request without mandatory arguments
+		Check Knn return 200 with mandatory arguments
+		"""
+		Rarg = "R=%s" % self.radius
+		Uarg = "U=%s" % self.user_id
+		for arg in (Rarg, Uarg):
+			res = self.client.get("%s?%s" % (self.url, arg))
+			self.assertEquals(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+		res = self.client.get("%s?%s&%s" % (self.url, Rarg, Uarg))
+		self.assertEquals(res.status_code, status.HTTP_200_OK)
+
 if __name__ == "__main__":
 	suites = list()
-	for test in (TestDB, TestUserList, TestUser, TestInfo):
+	for test in (TestDB, TestUserList, TestUser, TestInfo, TestKnn):
 		suites.append(unittest.TestLoader().loadTestsFromTestCase(test))
 	suite = unittest.TestSuite(suites)
 	results = unittest.TextTestRunner(verbosity = 2).run(suite)
