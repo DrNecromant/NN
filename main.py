@@ -236,7 +236,8 @@ class Knn(Resource):
 	def getkNN(self, stats):
 		"""
 		=== Main algorythm ===
-		If rect has small user count, check all distances
+		If rect small enough (side < R/10) or
+		amount of users is small enogh check all distances
 		and return users count inside the search zone
 		Check rect and the search zone
 			- If outside return 0
@@ -264,8 +265,11 @@ class Knn(Resource):
 			return stats.count
 
 		# Intersection between rectangle and search area
-		if stats.count <= MIN_USERS:
+		if (stats.maxX - stats.minX) < self.r / 10 \
+						or (stats.maxY - stats.minY) < self.r \
+						or stats.count < MIN_USERS:
 			# In case of small amount of users, calculate distances manually
+			# In case of small rect side, calculate distances manually
 			users = DBUser.query.filter(\
 				DBUser.x >= stats.minX, \
 				DBUser.x <= stats.maxX, \
