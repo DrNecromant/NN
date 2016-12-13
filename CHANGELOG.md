@@ -1,5 +1,12 @@
 # Change Log
 
+## v1.3.1
+- Added documenation for usage
+- Added TODO
+- Fixed DELETE operation
+- Minor fixes for comments and logs
+- Cleanup
+
 ## v1.3.0
 - Added benchmark test
 - Added pre-created benchmark DB
