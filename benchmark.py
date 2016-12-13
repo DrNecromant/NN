@@ -42,4 +42,6 @@ if __name__ == '__main__':
 				timelist.append(exec_time)
 				print "\n", test.__name__, initial_user_id, radius, knn, exec_time, 
 		results[test.__name__] = sum(timelist) / len(timelist)
-	print "\nRESULTS (average exec time): ", results
+	print "\n\nRESULTS:\n"
+	for testname in results:
+		print "\t%s: %s" %(testname, results[testname])
