@@ -120,8 +120,8 @@ class User(Resource):
 	Controller for other user CRUD actions
 	Example:
 		curl http://127.0.0.1:5000/v1/NN/users/id -X GET
-		curl http://127.0.0.1:5000/v1/NN/users/id/update -X POST -d '{"x": 4}'
-		curl http://127.0.0.1:5000/v1/NN/users/id/delete -X DELETE
+		curl http://127.0.0.1:5000/v1/NN/users/id -X POST -d '{"x": 4}'
+		curl http://127.0.0.1:5000/v1/NN/users/id -X DELETE
 	"""
 
 	def _not_found_error(self, user_id):
@@ -172,10 +172,11 @@ class User(Resource):
 		"""
 		Delete User object
 		"""
-		user = DBUser.query.filter_by(id = user_id).first()
+		query = DBUser.query.filter_by(id = user_id)
+		user = query.first()
 		if not user:
 			return self._not_found_error(user_id)
-		user.query.delete()
+		query.delete()
 		db.session.commit()
 		return {
 			"message": "OK"
@@ -314,8 +315,6 @@ class Knn(Resource):
 			return {
 				"message": "Bad request. U argument is required."
 			}, status.HTTP_400_BAD_REQUEST
-
-		#TODO: Check min users
 
 		u = DBUser.query.filter_by(id = user_id).first()
 		if not u:
