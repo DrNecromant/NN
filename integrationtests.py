@@ -72,6 +72,8 @@ class TestNN(unittest.TestCase):
 				y = json_result[user_id]["y"]
 				if sqrt((x0 - x) ** 2 + (y0 - y) ** 2) <= self.radius:
 					result2 += 1
+		# exclude initial user
+		result2 -= 1
 		self.assertEquals(result1, result2)
 		print "Results are equal"
 				

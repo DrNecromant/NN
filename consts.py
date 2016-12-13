@@ -15,3 +15,6 @@ class TestingConfig(object):
 	DEBUG = True
 	SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
 	SQLALCHEMY_TRACK_MODIFICATIONS = True
+
+class BenchmarkConfig(TestingConfig):
+	SQLALCHEMY_DATABASE_URI = "sqlite:///benchmark.db"

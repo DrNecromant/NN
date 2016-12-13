@@ -1,5 +1,6 @@
 from math import sqrt
 import os
+import sys
 
 from flask import Flask, request
 from flask_api import status
@@ -15,6 +16,8 @@ if __name__ == '__main__':
 	# re-create DB to not conflict with old data
 	if os.path.exists(DBFile):
 		os.unlink(DBFile)
+elif sys.argv[0] == "benchmark.py":
+	app.config.from_object('consts.BenchmarkConfig')
 else:
 	app.config.from_object('consts.TestingConfig')
 # Catch all unexpected 404s in json format
@@ -315,7 +318,7 @@ class Knn(Resource):
 
 		self.x0, self.y0 = (u.x, u.y)
 		self.r = r
-		result = self.getkNN(init_stats)
+		result = self.getkNN(init_stats) - 1
 
 		return {
 			"message": "OK",
