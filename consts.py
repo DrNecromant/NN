@@ -1,6 +1,6 @@
 BASEURL = "/v1/NN"
 SQL_TESTDATA_COUNT = 100
-MIN_USERS = 10
+MIN_USERS = 1000
 
 DBFile = "production.db"
 
