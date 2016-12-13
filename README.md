@@ -39,6 +39,77 @@ NTechLab assignment
 
 ### API usage
 
+#### Create users
+```
+$curl http://127.0.0.1:5000/v1/NN/users -X POST -d '{"x": 1, "y": 2}'
+{
+    "message": "Created", 
+    "user_url": "http://127.0.0.1:5000/v1/NN/users/1"
+}
+$curl http://127.0.0.1:5000/v1/NN/users -X POST -d '{"x": 2, "y": 1}'
+{
+    "message": "Created", 
+    "user_url": "http://127.0.0.1:5000/v1/NN/users/2"
+}
+$curl http://127.0.0.1:5000/v1/NN/users -X POST -d '{"x": 0, "y": 0}'
+{
+    "message": "Created", 
+    "user_url": "http://127.0.0.1:5000/v1/NN/users/3"
+}
+```
+
+#### Modify and delete users
+```
+$curl http://127.0.0.1:5000/v1/NN/users/1 -X POST -d '{"y": 3}'
+{
+    "message": "OK", 
+    "user_url": "http://127.0.0.1:5000/v1/NN/users/1/1"
+}
+$curl http://127.0.0.1:5000/v1/NN/users/3 -X DELETE
+{
+    "message": "OK"
+}
+```
+
+#### Show users and stats info
+```
+$curl http://127.0.0.1:5000/v1/NN/users -X GET
+{
+    "message": "OK", 
+    "users": {
+        "1": {
+            "user_url": "http://127.0.0.1:5000/v1/NN/users/1", 
+            "x": 1, 
+            "y": 3
+        }, 
+        "2": {
+            "user_url": "http://127.0.0.1:5000/v1/NN/users/2", 
+            "x": 2, 
+            "y": 1
+        }
+    }
+}
+$curl http://127.0.0.1:5000/v1/NN/users/info -X GET
+{
+    "message": "OK", 
+    "user_count": 2
+}
+```
+
+#### find kNN
+```
+$curl http://127.0.0.1:5000/v1/NN/users/knn?U=1\&R=5 -X GET
+{
+    "message": "OK", 
+    "result": 1
+}
+$curl http://127.0.0.1:5000/v1/NN/users/knn?U=1\&R=1 -X GET
+{
+    "message": "OK", 
+    "result": 0
+}
+```
+
 ### Unittests
 ```
 $python unittests.py
