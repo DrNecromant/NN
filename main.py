@@ -221,6 +221,18 @@ class Knn(Resource):
 
 		return min(dists), max(dists)
 
+	def getDistkNN(self, stats):
+		"""
+		Algorythm by comparing all distances with radius
+		Used in benchmark test
+		"""
+		result = 0
+		for user in DBUser.query.yield_per(100):
+			dist = sqrt((user.x - self.x0) ** 2 + (user.y - self.y0) ** 2)
+			if dist <= self.r:
+				result += 1
+		return result
+
 	def getkNN(self, stats):
 		"""
 		=== Main algorythm ===
@@ -289,6 +301,7 @@ class Knn(Resource):
 		"""
 		r = int(request.args.get('R', 0))
 		user_id = int(request.args.get('U', 0))
+		dist_angorythm = request.args.get('dist', None)
 		if not r:
 			return {
 				"message": "Bad request. R argument is required."
@@ -318,7 +331,11 @@ class Knn(Resource):
 
 		self.x0, self.y0 = (u.x, u.y)
 		self.r = r
-		result = self.getkNN(init_stats) - 1
+
+		if dist_angorythm == "Y":
+			result = self.getDistkNN(init_stats) - 1
+		else:
+			result = self.getkNN(init_stats) - 1
 
 		return {
 			"message": "OK",

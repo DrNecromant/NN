@@ -268,6 +268,8 @@ class TestKnn(unittest.TestCase):
 		db.session.commit()
 		res = self.client.get("%s?%s&%s" % (self.url, Rarg, Uarg))
 		self.assertEquals(res.status_code, status.HTTP_200_OK)
+		res = self.client.get("%s?%s&%s&dist=Y" % (self.url, Rarg, Uarg))
+		self.assertEquals(res.status_code, status.HTTP_200_OK)
 
 if __name__ == "__main__":
 	suites = list()
