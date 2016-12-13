@@ -187,5 +187,12 @@ RESULTS:
 	testBinarySearch: 4.06153618495
 ```
 
+## TODO
+* Info controller should provide also max, min, avg, density stats
+* All math operations should be moved to separate module
+* Unittests for math operations
+* Add good logging, remove/replace prints to support Python 3 (!!!)
+* Algorythm optimization: choose carefully size of rectangle to split
+
 ## License
 Feel free to use my code on production environments and good luck. =)
