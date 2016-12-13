@@ -1,5 +1,11 @@
 # Change Log
 
+## v1.3.0
+- Added benchmark test
+- Added pre-created benchmark DB
+- Integration test optimization
+- Main algorythm optimization
+
 ## v1.2.3
 - Added integration test
 
