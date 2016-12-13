@@ -37,45 +37,26 @@ class TestNN(unittest.TestCase):
 			res = requests.post(url, data = '{"x": "%s", "y": "%s"}' % coord.pop())
 			self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 			
-		print "Get kNN by binary algorythm..."
-		url = "%s/users/knn" % self.baseurl
 		Rarg = "R=%s" % self.radius
 		Uarg = "U=%s" % self.user_id
+		Darg = "dist=Y"
+
+		print "Get kNN by binary algorythm..."
+		url = "%s/users/knn" % self.baseurl
 		url = "%s?%s&%s" % (url, Rarg, Uarg)
 		res = requests.get(url)
 		self.assertEquals(res.status_code, status.HTTP_200_OK)
 		result1 = res.json()["result"]
 
 		print "Get kNN by calculating all distances..."
-		result2 = 0
-		url = "%s/users/%s" % (self.baseurl, self.user_id)
+		url = "%s/users/knn" % self.baseurl
+		url = "%s?%s&%s&%s" % (url, Rarg, Uarg, Darg)
 		res = requests.get(url)
 		self.assertEquals(res.status_code, status.HTTP_200_OK)
-		json_result = res.json()
-		x0 = json_result["x"]
-		y0 = json_result["y"]
-		url = "%s/users/info" % self.baseurl
-		res = requests.get(url)
-		self.assertEquals(res.status_code, status.HTTP_200_OK)
-		user_count = res.json()["user_count"]
-		print "Fetching %s users..." % user_count
-		page_count = user_count / self.page_size
-		if user_count % self.page_size:
-			page_count += 1
-		for page_id in range(page_count):
-			url = "%s/users?pagesize=%s&page=%s" % (self.baseurl, self.page_size, page_id)
-			res = requests.get(url)
-			self.assertEquals(res.status_code, status.HTTP_200_OK)
-			json_result = res.json()["users"]
-			for user_id in json_result:
-				x = json_result[user_id]["x"]
-				y = json_result[user_id]["y"]
-				if sqrt((x0 - x) ** 2 + (y0 - y) ** 2) <= self.radius:
-					result2 += 1
-		# exclude initial user
-		result2 -= 1
+		result2 = res.json()["result"]
+
 		self.assertEquals(result1, result2)
-		print "Results are equal"
+		print "Results are equal", result1, result2
 				
 if __name__ == '__main__':
     unittest.main()
